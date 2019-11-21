@@ -6,6 +6,9 @@
 <!-- the name of the operation -->
 <!ATTLIST redis-call name CDATA #REQUIRED>
 
+<!-- The Redis server URI, override the channel endpoint -->
+<!ATTLIST redis-call uri CDATA #IMPLIED>
+
 <!--
 	  Redis SET operation 
 	  #Label: @name
