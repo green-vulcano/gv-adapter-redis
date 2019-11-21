@@ -25,7 +25,7 @@ import it.greenvulcano.configuration.XMLConfig;
 import it.greenvulcano.gvesb.core.config.GreenVulcanoConfig;
 import it.greenvulcano.gvesb.virtual.OperationFactory;
 import it.greenvulcano.gvesb.virtual.redis.RedisCall;
-import it.greenvulcano.gvesb.channel.redis.RedisDBChannel;
+import it.greenvulcano.gvesb.channel.redis.RedisChannel;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -43,13 +43,13 @@ public class Activator implements BundleActivator {
 		// if the GV ESB configuration file gets deleted, then shutdown the opened channel with the Redis database
 		if (event.getCode() == ConfigurationEvent.EVT_FILE_REMOVED && event.getFile().equals(GreenVulcanoConfig.getSystemsConfigFileName())) {
 
-			RedisDBChannel.shutdown();
+			RedisChannel.shutdown();
 
 		}
 
 		else if (event.getCode() == ConfigurationEvent.EVT_FILE_LOADED && event.getFile().equals(GreenVulcanoConfig.getSystemsConfigFileName())) {
 
-			RedisDBChannel.setup();
+			RedisChannel.setup();
 
 		}
 
@@ -59,8 +59,9 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext context) throws Exception {
 
 		// register the operations associated to the Redis connector
+	        log.debug("Starting GV ESB Redis plugin module");
 
-		RedisDBChannel.setup();
+		RedisChannel.setup();
 				
 		OperationFactory.registerSupplier("redis-call", RedisCall::new);
 
@@ -73,6 +74,8 @@ public class Activator implements BundleActivator {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		
+	        log.debug("Stopping GV ESB Redis plugin module");
+	    
 		// unregister the configuration listener to watch for changes to the GV ESB systems configuration file
 
 		XMLConfig.removeConfigurationListener(configurationListener);
