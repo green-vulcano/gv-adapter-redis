@@ -43,7 +43,8 @@ public abstract class RedisOperation {
     static {
         FACTORY_SUPPLIERS = Collections.unmodifiableMap(Map.of(RedisOperationGet.TYPE, RedisOperationGet::new, 
                                                                RedisOperationSet.TYPE, RedisOperationSet::new, 
-                                                               RedisOperationDelete.TYPE, RedisOperationDelete::new, 
+                                                               RedisOperationDelete.TYPE, RedisOperationDelete::new,
+                                                               RedisOperationLpush.TYPE, RedisOperationLpush::new,
                                                                RedisOperationKeys.TYPE, RedisOperationKeys::new));
     }
     
