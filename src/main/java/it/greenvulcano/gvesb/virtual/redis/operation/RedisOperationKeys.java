@@ -20,7 +20,9 @@
 package it.greenvulcano.gvesb.virtual.redis.operation;
 
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import it.greenvulcano.gvesb.buffer.GVBuffer;
 import it.greenvulcano.gvesb.buffer.GVException;
@@ -37,7 +39,18 @@ public class RedisOperationKeys extends RedisOperation{
     @Override
     public void perform(Jedis redisConnection, String key, GVBuffer gvBuffer) throws GVException {
       Set<String> keys = redisConnection.keys(key);
+      
+      JSONArray result = new JSONArray();
+      for (String k : keys) {
+          JSONObject entry = new JSONObject();
+           entry.put("key", k)
+                .put("type", redisConnection.type(k));
+           
+           result.put(entry);
+          
+      }
+      
       gvBuffer.setProperty("REDIS_KEYS_REPLY", Integer.toString(keys.size()));
-      gvBuffer.setObject(keys.stream().map(k->"\""+k+"\"").collect(Collectors.joining(",", "[", "]")));
+      gvBuffer.setObject(result.toString());
     }
 }
