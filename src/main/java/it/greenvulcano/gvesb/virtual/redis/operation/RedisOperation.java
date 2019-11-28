@@ -45,6 +45,9 @@ public abstract class RedisOperation {
                                                                RedisOperationSet.TYPE, RedisOperationSet::new, 
                                                                RedisOperationDelete.TYPE, RedisOperationDelete::new,
                                                                RedisOperationLpush.TYPE, RedisOperationLpush::new,
+                                                               RedisOperationRpush.TYPE, RedisOperationLpush::new,
+                                                               RedisOperationLpop.TYPE, RedisOperationLpush::new,
+                                                               RedisOperationRpop.TYPE, RedisOperationLpush::new,
                                                                RedisOperationKeys.TYPE, RedisOperationKeys::new));
     }
     
