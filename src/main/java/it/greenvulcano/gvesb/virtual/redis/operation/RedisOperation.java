@@ -21,6 +21,7 @@ package it.greenvulcano.gvesb.virtual.redis.operation;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -34,52 +35,82 @@ import redis.clients.jedis.Jedis;
 
 public abstract class RedisOperation {
 
-    private final String operationType;
-    private String key;
+	private final String operationType;
+	private String key;
 
-    private final static Map<String, Supplier<RedisOperation>> FACTORY_SUPPLIERS; 
-    
-    
-    static {
-        FACTORY_SUPPLIERS = Collections.unmodifiableMap(Map.of(RedisOperationGet.TYPE, RedisOperationGet::new, 
-                                                               RedisOperationSet.TYPE, RedisOperationSet::new, 
-                                                               RedisOperationDelete.TYPE, RedisOperationDelete::new,
-                                                               RedisOperationLpush.TYPE, RedisOperationLpush::new,
-                                                               RedisOperationRpush.TYPE, RedisOperationLpush::new,
-                                                               RedisOperationLpop.TYPE, RedisOperationLpush::new,
-                                                               RedisOperationRpop.TYPE, RedisOperationLpush::new,
-                                                               RedisOperationKeys.TYPE, RedisOperationKeys::new));
-    }
-    
-    protected RedisOperation(String operationType) {
-        this.operationType = operationType;
-    }
+	private final static Map<String, Supplier<RedisOperation>> FACTORY_SUPPLIERS; 
 
-    public String getOperationType() {
-        return operationType;
-    }
-    
-    public String getKey() {
-        return key;
-    }
-    
-    public void setKey(String key) {
-        this.key = key;
-    }
 
-    public abstract void perform(Jedis redisConnection, String key, GVBuffer gvBuffer) throws GVException;
+	static {
+		FACTORY_SUPPLIERS = Collections.unmodifiableMap(Map.ofEntries(
+				
+				// VALUE: String
+				Map.entry(RedisOperationGet.TYPE, RedisOperationGet::new),
+				Map.entry(RedisOperationSet.TYPE, RedisOperationSet::new), 
+				Map.entry(RedisOperationDelete.TYPE, RedisOperationDelete::new),
+				
+				// VALUE: List
+				Map.entry(RedisOperationLpush.TYPE, RedisOperationLpush::new),
+				Map.entry(RedisOperationRpush.TYPE, RedisOperationLpush::new),
+				Map.entry(RedisOperationLpop.TYPE, RedisOperationLpush::new),
+				Map.entry(RedisOperationRpop.TYPE, RedisOperationLpush::new),
+				Map.entry(RedisOperationLlen.TYPE, RedisOperationLlen::new),
+				
+				// VALUE: Set
+				Map.entry(RedisOperationSadd.TYPE, RedisOperationSadd::new),
+				Map.entry(RedisOperationSismember.TYPE, RedisOperationSismember::new),
+				Map.entry(RedisOperationSpop.TYPE, RedisOperationSpop::new),
+				Map.entry(RedisOperationScard.TYPE, RedisOperationScard::new),
+				Map.entry(RedisOperationSrem.TYPE, RedisOperationSrem::new),
+				Map.entry(RedisOperationSmembers.TYPE, RedisOperationSmembers::new),
+				Map.entry(RedisOperationSunion.TYPE, RedisOperationSunion::new),
+				Map.entry(RedisOperationSdiff.TYPE, RedisOperationSdiff::new),
+				
+				// VALUE: Sorted Set 
+								
+				
+				// VALUE: Hash
+								
+				
+				// VALUE: Bitmap
+								
+				
+				// VALUE: HyperLogLog
+								
+				
+				// VALUE: Other
+				Map.entry(RedisOperationKeys.TYPE, RedisOperationKeys::new)));
+	}
 
-    public static RedisOperation build(Node redisOperationNode) throws XMLConfigException {
+	protected RedisOperation(String operationType) {
+		this.operationType = operationType;
+	}
 
-        String operationName = redisOperationNode.getLocalName();
-        
-        RedisOperation redisOperation = Optional.ofNullable(FACTORY_SUPPLIERS.get(operationName))
-                                                .orElseThrow(()->new XMLConfigException("Invalid operation "+operationName))
-                                                .get();
+	public String getOperationType() {
+		return operationType;
+	}
 
-        redisOperation.setKey(XMLConfig.get(redisOperationNode, "@key"));
-        
-        return redisOperation;
-    }
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	public abstract void perform(Jedis redisConnection, String key, GVBuffer gvBuffer) throws GVException;
+
+	public static RedisOperation build(Node redisOperationNode) throws XMLConfigException {
+
+		String operationName = redisOperationNode.getLocalName();
+
+		RedisOperation redisOperation = Optional.ofNullable(FACTORY_SUPPLIERS.get(operationName))
+				.orElseThrow(()->new XMLConfigException("Invalid operation "+operationName))
+				.get();
+
+		redisOperation.setKey(XMLConfig.get(redisOperationNode, "@key"));
+
+		return redisOperation;
+	}
 
 }
