@@ -19,18 +19,15 @@
  *******************************************************************************/
 package it.greenvulcano.gvesb.virtual.redis.operation;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.Supplier;
-
 import org.w3c.dom.Node;
 
-import it.greenvulcano.configuration.XMLConfig;
 import it.greenvulcano.configuration.XMLConfigException;
 import it.greenvulcano.gvesb.buffer.GVBuffer;
 import it.greenvulcano.gvesb.buffer.GVException;
+import it.greenvulcano.util.metadata.PropertiesHandlerException;
 import redis.clients.jedis.Jedis;
 
 public abstract class RedisOperation {
@@ -38,50 +35,8 @@ public abstract class RedisOperation {
 	private final String operationType;
 	private String key;
 
-	private final static Map<String, Supplier<RedisOperation>> FACTORY_SUPPLIERS; 
-
-
-	static {
-		FACTORY_SUPPLIERS = Collections.unmodifiableMap(Map.ofEntries(
-				
-				// VALUE: String
-				Map.entry(RedisOperationGet.TYPE, RedisOperationGet::new),
-				Map.entry(RedisOperationSet.TYPE, RedisOperationSet::new), 
-				Map.entry(RedisOperationDelete.TYPE, RedisOperationDelete::new),
-				
-				// VALUE: List
-				Map.entry(RedisOperationLpush.TYPE, RedisOperationLpush::new),
-				Map.entry(RedisOperationRpush.TYPE, RedisOperationLpush::new),
-				Map.entry(RedisOperationLpop.TYPE, RedisOperationLpush::new),
-				Map.entry(RedisOperationRpop.TYPE, RedisOperationLpush::new),
-				Map.entry(RedisOperationLlen.TYPE, RedisOperationLlen::new),
-				
-				// VALUE: Set
-				Map.entry(RedisOperationSadd.TYPE, RedisOperationSadd::new),
-				Map.entry(RedisOperationSismember.TYPE, RedisOperationSismember::new),
-				Map.entry(RedisOperationSpop.TYPE, RedisOperationSpop::new),
-				Map.entry(RedisOperationScard.TYPE, RedisOperationScard::new),
-				Map.entry(RedisOperationSrem.TYPE, RedisOperationSrem::new),
-				Map.entry(RedisOperationSmembers.TYPE, RedisOperationSmembers::new),
-				Map.entry(RedisOperationSunion.TYPE, RedisOperationSunion::new),
-				Map.entry(RedisOperationSdiff.TYPE, RedisOperationSdiff::new),
-				
-				// VALUE: Sorted Set 
-								
-				
-				// VALUE: Hash
-								
-				
-				// VALUE: Bitmap
-								
-				
-				// VALUE: HyperLogLog
-								
-				
-				// VALUE: Other
-				Map.entry(RedisOperationKeys.TYPE, RedisOperationKeys::new)));
-	}
-
+	private final static Map<String, RedisOperationBuilder> BUILDERS = new HashMap<>();
+	
 	protected RedisOperation(String operationType) {
 		this.operationType = operationType;
 	}
@@ -98,19 +53,25 @@ public abstract class RedisOperation {
 		this.key = key;
 	}
 
-	public abstract void perform(Jedis redisConnection, String key, GVBuffer gvBuffer) throws GVException;
-
+	public abstract void perform(Jedis redisConnection, String key, GVBuffer gvBuffer) throws GVException, PropertiesHandlerException;
+	
+	protected static void registerBuilder(String type, RedisOperationBuilder builder) {
+	    BUILDERS.put(type, builder);
+	}
+	
 	public static RedisOperation build(Node redisOperationNode) throws XMLConfigException {
 
 		String operationName = redisOperationNode.getLocalName();
 
-		RedisOperation redisOperation = Optional.ofNullable(FACTORY_SUPPLIERS.get(operationName))
-				.orElseThrow(()->new XMLConfigException("Invalid operation "+operationName))
-				.get();
+		return Optional.ofNullable(BUILDERS.get(operationName))
+		               .orElseThrow()
+		               .build(redisOperationNode);
 
-		redisOperation.setKey(XMLConfig.get(redisOperationNode, "@key"));
-
-		return redisOperation;
+	}
+	
+	public interface RedisOperationBuilder {	    
+	    RedisOperation build(Node redisOperationNode) throws XMLConfigException;
+	    
 	}
 
 }
