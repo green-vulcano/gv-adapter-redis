@@ -51,28 +51,28 @@ Some constraints apply to these XML nodes.
 
 - The ```redis-call``` node supports the following types of operation (divided by value type):
     - ***String***
-       - ```get```  to retrieve data from Redis;
+       - ```get``` to retrieve data from Redis;
        - ```set``` to put into Redis the GVBuffer data as value for the specified key;
        - ```delete``` to delete the specified key;
     - ***List***
-       - ```llen```
-       - ```lpop```
-       - ```lpush```
-       - ```rpop```
-       - ```rpush```
+       - ```llen``` to get the length of the list value stored for the specified key; 
+       - ```lpop``` to remove and return the leftmost element of the list value;
+       - ```lpush``` to insert an element on the left into the list;
+       - ```rpop``` to remove and return the rightmost element of the list value;
+       - ```rpush``` to insert an element on the right into the list;
     - ***Set***
-       - ```sadd```
-       - ```scard```
-       - ```sismember```
-       - ```smembers```
-       - ```spop```
-       - ```srem```
-       - ```sunion```
+       - ```scard``` to get the size of a set value stored at a key; 
+       - ```sismember``` to check if the specified element is a member of the set or not;
+       - ```sadd``` to insert one element in the set value;
+       - ```spop``` to remove and return one element from a set value stored at a key;
+       - ```srem``` to delete one element from the set value;
+       - ```smembers``` to get all the elements of a set value;
+       - ```sunion``` to perform union operation on two sets and returns the result as an array;
     - ***Hash***
-       - ```hdel```
-       - ```hget```
-       - ```hlen```
-       - ```hset```
+       - ```hlen``` to get the number of fields contained in the hash value stored at a key;
+       - ```hset``` to set the specified value to its respective field in the hash value. If field already exists, then it’s value is overwritten. If key does not exist, then a new key holding a hash value is created before performing the set operation;
+       - ```hget``` to return the value associated with a single field contained inside the hash value;
+       - ```hdel``` to delete one or more fields from the hash value stored at a key;
     - ***Generic***
        - ```keys``` to retrieve the keys matching the specified pattern;
 
