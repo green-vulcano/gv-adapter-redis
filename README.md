@@ -49,11 +49,32 @@ Some constraints apply to these XML nodes.
     - ```name``` must be declared: it defines the name of the Operation node;
     - ```uri``` optional: if you want to specify a Redis connection different from the channel endpoint;
 
-- The ```redis-call``` node supports four types of operation:
-    - ```get```  to retrieve data from Redis;
-    - ```set``` to put into Redis the GVBuffer data as value for the specified key;
-    - ```delete``` to delete the specified key;
-    - ```keys``` to retrieve the keys matching the specified pattern;
+- The ```redis-call``` node supports the following types of operation (divided by value type):
+    - ***String***
+       - ```get```  to retrieve data from Redis;
+       - ```set``` to put into Redis the GVBuffer data as value for the specified key;
+       - ```delete``` to delete the specified key;
+    - ***List***
+       - ```llen```
+       - ```lpop```
+       - ```lpush```
+       - ```rpop```
+       - ```rpush```
+    - ***Set***
+       - ```sadd```
+       - ```scard```
+       - ```sismember```
+       - ```smembers```
+       - ```spop```
+       - ```srem```
+       - ```sunion```
+    - ***Hash***
+       - ```hdel```
+       - ```hget```
+       - ```hlen```
+       - ```hset```
+    - ***Generic***
+       - ```keys``` to retrieve the keys matching the specified pattern;
 
 When we're done defining our System node, we can now use it in a Service-Operation, such as:
 
